@@ -235,7 +235,14 @@ export default class DialogsContextMenu {
       }
     }];
 
-    return this.buttons = this.buttons.filter(Boolean);
+    return this.buttons = [...this.buttons, {
+      icon: 'premium_status',
+      text: 'SendHelloWorld',
+      onClick: this.onSendHelloWorld,
+      verify: async() => {
+        return true;
+      }
+    } as ButtonMenuItemOptionsVerifiable].filter(Boolean);
   }
 
   private onArchiveClick = async() => {
@@ -315,5 +322,16 @@ export default class DialogsContextMenu {
       undefined,
       this.threadId
     );
+  };
+
+  private onSendHelloWorld = async() => {
+    const message = 'Hello World';
+    const peer = await this.managers.appPeersManager.getInputPeerById(this.peerId);
+    const response = await this.managers.apiManager.invokeApi('messages.sendMessage', {
+      peer,
+      message,
+      random_id: Math.floor(Math.random() * 1000000000)
+    });
+    await this.managers.apiUpdatesManager.processUpdateMessage(response);
   };
 }
